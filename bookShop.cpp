@@ -4,27 +4,7 @@ using namespace std;
 #define endl '\n'
 typedef long long ll;
 
-const int mod = 1e9 + 7;
-const ll INF = LLONG_MAX >> 1;
-
-int fbu(vector<int>& price, vector<int>& pages, int x) {
-    int n = price.size();
-    vector<vector<int>> dp(n + 1, vector<int>(x + 1, 0));
-
-    for (int i = 1; i <= n; i++) {
-        for (int j = 0; j <= x; j++) {
-            dp[i][j] = dp[i - 1][j];
-            if (price[i - 1] <= j) {
-                dp[i][j] = max(dp[i][j], pages[i - 1] + dp[i - 1][j - price[i - 1]]); 
-            }
-        }
-    }
-
-    return dp[n][x];
-}
-
 int main() {
-    
     int n, x;
     cin >> n >> x;
     vector<int> price(n);
@@ -37,7 +17,21 @@ int main() {
         cin >> pages[i];
     }
 
-    cout << fbu(price, pages, x);
+    vector<vector<int>> dp(n + 1, vector<int>(x + 1, 0));
+
+    for (int i = 1; i <= n; i++) {
+        for (int money = 0; money <= x; money++) {
+            if (money == 0 || i == 0)
+                dp[i][money] = 0;
+            else {
+                int op1 = (i == 1) ? 0 : dp[i - 1][money];
+                int op2 = (money < price[i - 1]) ? 0 : pages[i - 1] + dp[i - 1][money - price[i - 1]];
+                dp[i][money] = max(op1, op2);
+            }
+        }
+    }
+
+    cout << dp[n][x];
 
     return 0;
 }
