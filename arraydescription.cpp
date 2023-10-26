@@ -1,54 +1,41 @@
 #include <bits/stdc++.h>
-#define ll long long
-#define pb push_back
-#define for_range(start, end, index) for(int index = start; index < end; index++)
-#define for_each(index, start, end) for(int index = start; index < end; index++)
-#define mod 1000000007
-#define inf (1LL << 60)
-#define all(x) (x).begin(), (x).end()
-#define prDouble(x) cout << fixed << setprecision(10) << x
-#define triplet pair<ll, pair<ll, ll>>
-#define fast_io ios_base::sync_with_stdio(false); cin.tie(NULL)
 using namespace std;
 
-int countWaysToPaint(int n, int m, vector<int>& preferences) {
-    int dp[n + 2][m + 2];
-    memset(dp, 0, sizeof dp);
+const int MOD = 1e9 + 7;
 
-    for_range(1, n, i) {
-        for_range(1, m, x) {
-            if (i == 1) {
-                if (preferences[i] == 0 || preferences[i] == x)
-                    dp[i][x] = 1;
-                else
-                    dp[i][x] = 0;
-            } else {
-                if (preferences[i] == 0 || preferences[i] == x) {
-                    dp[i][x] = ((dp[i - 1][x - 1] + dp[i - 1][x]) % mod + dp[i - 1][x + 1]) % mod;
-                } else
-                    dp[i][x] = 0;
+int main() {
+    int n, m;
+    cin >> n >> m;
+
+    vector<int> a(n);
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+    }
+
+    vector<vector<int>> dp(n, vector<int>(m + 1, 0));
+
+    for (int j = 1; j <= m; j++) {
+        if (a[0] == 0 || a[0] == j) {
+            dp[0][j] = 1;
+        }
+    }
+
+    for (int i = 1; i < n; i++) {
+        for (int j = 1; j <= m; j++) {
+            if (a[i] == 0 || a[i] == j) {
+                dp[i][j] = dp[i - 1][j];
+                if (j > 1) dp[i][j] = (dp[i][j] + dp[i - 1][j - 1]) % MOD;
+                if (j < m) dp[i][j] = (dp[i][j] + dp[i - 1][j + 1]) % MOD;
             }
         }
     }
 
-    int waysToPaint = 0;
-    for_range(1, m, x)
-        waysToPaint = (waysToPaint + dp[n][x]) % mod;
-    return waysToPaint;
-}
-
-int main() {
-    fast_io;
-    ll t, n, m, x, i, j, k, q;
-    // cin >> t;
-    t = 1;
-    while (t--) {
-        int n, m;
-        cin >> n >> m;
-        vector<int> preferences(n + 1);
-        for_range(1, n + 1, i)
-            cin >> preferences[i];
-        cout << countWaysToPaint(n, m, preferences);
+    int ways = 0;
+    for (int j = 1; j <= m; j++) {
+        ways = (ways + dp[n - 1][j]) % MOD;
     }
+
+    cout << ways << endl;
+
     return 0;
 }
